@@ -38,4 +38,30 @@ export class HeroesService {
     let params = new HttpParams().set('q', termino).set('_limit', 6);
     return this.http.get<Heroe[]>(`${this.baseUrl}/heroes`, { params });
   }
+
+  /**
+   * Metodo para crear un nuevo heroe
+   * @param heroe
+   */
+  createHeroe(heroe: Heroe): Observable<Heroe> {
+    return this.http.post<Heroe>(`${this.baseUrl}/heroes/`, heroe);
+  }
+
+  /**
+   * Metodo para actualizar un heroe
+   * @param heroe
+   * @returns
+   */
+  updateHeroe(heroe: Heroe): Observable<Heroe> {
+    return this.http.put<Heroe>(`${this.baseUrl}/heroes/${heroe.id}`, heroe);
+  }
+
+  /**
+   * Metodo para eliminar un registro segun su id
+   * @param id
+   * @returns
+   */
+  deleteHeroe(id: string): Observable<any> {
+    return this.http.delete<any>(`${this.baseUrl}/heroes/${id}`);
+  }
 }
