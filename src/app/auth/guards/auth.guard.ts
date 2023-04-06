@@ -4,32 +4,39 @@ import {
   CanActivate,
   CanLoad,
   Route,
+  Router,
   RouterStateSnapshot,
   UrlSegment,
   UrlTree,
 } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AuthGuard implements CanLoad {
-  constructor(private authService: AuthService) {}
+export class AuthGuard implements CanLoad, CanActivate {
+  constructor(private authService: AuthService, private router: Router) {}
 
-  // canActivate(
-  //   route: ActivatedRouteSnapshot,
-  //   state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-  //   return true;
-  // }
+  // Interfaz para validar si se va a una ruta sin login
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Observable<boolean> | Promise<boolean> | boolean | UrlTree {
+    return this.authService.verificarAutenticacion();
+  }
+
+  // Interfaz para validar si se carga un modulo sin login
   canLoad(
     route: Route,
     segments: UrlSegment[]
   ): Observable<boolean> | Promise<boolean> | boolean {
-    if (this.authService.auth.id) {
-      return true;
-    }
-    console.log(`Bloquedo por el authGuard`);
-    return false;
+    return this.authService.verificarAutenticacion().pipe(
+      tap((estaAutenticado) => {
+        if (!estaAutenticado) {
+          this.router.navigate(['./auth/login']);
+        }
+      })
+    );
   }
 }
